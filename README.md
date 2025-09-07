@@ -1,7 +1,7 @@
 # Clean Code Examples in C#
 
-[![CI](https://github.com/YOURUSERNAME/CleanCode-CSharp/actions/workflows/ci.yml/badge.svg)](https://github.com/YOURUSERNAME/CleanCode-CSharp/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/YOURUSERNAME/CleanCode-CSharp/branch/main/graph/badge.svg)](https://codecov.io/gh/YOURUSERNAME/CleanCode-CSharp)
+[![CI](https://github.com/YOURUSERNAME/CleanCode-CSharp/actions/workflows/ci.yml/badge.svg)](https://github.com/Antonios-Georgiopoulos/CleanCode-CSharp/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/YOURUSERNAME/CleanCode-CSharp/branch/main/graph/badge.svg)](https://codecov.io/gh/Antonios-Georgiopoulos/CleanCode-CSharp)
 
 A comprehensive collection of Clean Code examples in C# demonstrating best practices and common anti-patterns.
 
@@ -22,7 +22,7 @@ This repository serves as a practical guide for writing clean, maintainable C# c
 ## 🚀 Getting Started
 
 ```bash
-git clone https://github.com/YOURUSERNAME/CleanCode-CSharp.git
+git clone https://github.com/Antonios-Georgiopoulos/CleanCode-CSharp.git
 cd CleanCode-CSharp
 dotnet restore
 dotnet build
