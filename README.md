@@ -11,12 +11,12 @@ This repository serves as a practical guide for writing clean, maintainable C# c
 ## 📚 Categories
 
 - [x] **Naming Conventions** - Meaningful names for variables, methods, and classes
-- [ ] **Functions/Methods** - Single responsibility, parameter management
-- [ ] **Classes** - Cohesion, encapsulation, proper design
-- [ ] **SOLID Principles** - Five fundamental principles of OOP
-- [ ] **Comments** - When and how to comment effectively
-- [ ] **Error Handling** - Exceptions, validation, defensive programming
-- [ ] **Code Formatting** - Consistent style and structure
+- [x] **Functions/Methods** - Single responsibility, parameter management
+- [x] **Classes** - Cohesion, encapsulation, proper design
+- [x] **SOLID Principles** - Five fundamental principles of OOP
+- [x] **Comments** - When and how to comment effectively
+- [x] **Error Handling** - Exceptions, validation, defensive programming
+- [x] **Code Formatting** - Consistent style and structure
 
 ## 🚀 Getting Started
 
@@ -32,9 +32,9 @@ dotnet test
 
 Each category contains:
 
-Bad/ - Examples of what NOT to do
-Good/ - Clean code alternatives
-Tests/ - Unit tests demonstrating usage
+- Bad/ - Examples of what NOT to do
+- Good/ - Clean code alternatives
+- Tests/ - Unit tests demonstrating usage
 
 ## 🤝 Contributing
 
