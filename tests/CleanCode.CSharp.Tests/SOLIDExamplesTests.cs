@@ -1,9 +1,4 @@
-﻿using CleanCode.Examples.SOLID.Bad;
-using CleanCode.Examples.SOLID.Good;
-
-using Xunit;
-
-namespace CleanCode.CSharp.Tests;
+﻿namespace CleanCode.CSharp.Tests;
 
 public class SOLIDExamplesTests
 {

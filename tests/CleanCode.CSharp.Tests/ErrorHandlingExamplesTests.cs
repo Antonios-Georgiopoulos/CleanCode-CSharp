@@ -1,8 +1,6 @@
 ﻿using CleanCode.Examples.ErrorHandling.Bad;
 using CleanCode.Examples.ErrorHandling.Good;
 
-using Xunit;
-
 using MockConfigService = CleanCode.Examples.ErrorHandling.Good.MockConfigService;
 using MockUserService = CleanCode.Examples.ErrorHandling.Good.MockUserService;
 using Order = CleanCode.Examples.ErrorHandling.Bad.Order;

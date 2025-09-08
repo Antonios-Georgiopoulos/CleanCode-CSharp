@@ -1,8 +1,6 @@
 ﻿using CleanCode.Examples.Functions.Bad;
 using CleanCode.Examples.Functions.Good;
 
-using Xunit;
-
 namespace CleanCode.CSharp.Tests;
 
 public class FunctionExamplesTests

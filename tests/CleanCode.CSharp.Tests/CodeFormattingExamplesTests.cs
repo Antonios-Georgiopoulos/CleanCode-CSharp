@@ -1,8 +1,6 @@
 ﻿using CleanCode.Examples.CodeFormatting.Bad;
 using CleanCode.Examples.CodeFormatting.Good;
 
-using Xunit;
-
 namespace CleanCode.CSharp.Tests;
 
 public class CodeFormattingExamplesTests

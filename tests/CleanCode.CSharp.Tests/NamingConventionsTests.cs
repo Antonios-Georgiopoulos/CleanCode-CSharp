@@ -1,8 +1,6 @@
 ﻿using CleanCode.Examples.NamingConventions.Bad;
 using CleanCode.Examples.NamingConventions.Good;
 
-using Xunit;
-
 namespace CleanCode.CSharp.Tests;
 
 public class NamingConventionsTests

@@ -1,8 +1,6 @@
 ﻿using CleanCode.Examples.Comments.Bad;
 using CleanCode.Examples.Comments.Good;
 
-using Xunit;
-
 namespace CleanCode.CSharp.Tests;
 
 public class CommentExamplesTests
