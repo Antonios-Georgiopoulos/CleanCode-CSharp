@@ -16,99 +16,229 @@ Well-designed functions are the building blocks of clean code. They should be sm
 
 **Consistent Abstraction Level** - All statements in a function should be at the same level of abstraction.
 
-## Bad Examples Analysis
+## Bad Examples
 
 ### Doing Too Many Things
 ```csharp
-ProcessUserAndGenerateReport() // Validates, processes, saves, emails, generates report, logs
+public string ProcessUserAndGenerateReport(string name, string email, int age, ...) {
+    // Validation
+    if (string.IsNullOrEmpty(name)) throw new ArgumentException("Name required");
+    
+    // Business logic
+    var bonus = department == "Sales" ? salary * 0.1 : 0;
+    
+    // Database operations
+    SaveToDatabase(user);
+    
+    // Email sending
+    SendWelcomeEmail(email);
+    
+    // Report generation
+    var report = $"User: {name}...";
+    
+    // Logging
+    Console.WriteLine($"Processed user {name}");
+    
+    return report;
+}
 ```
-This method violates Single Responsibility Principle by handling validation, business logic, database operations, email sending, and reporting.
+**Problem:** This method violates Single Responsibility Principle by handling validation, business logic, database operations, email sending, and reporting.
 
 ### Too Many Parameters
 ```csharp
-CreateOrder(customerName, customerEmail, customerPhone, customerAddress, 
-           productName, productPrice, quantity, discountPercent, ...)
+public void CreateOrder(string customerName, string customerEmail, string customerPhone,
+    string customerAddress, string productName, double productPrice, int quantity,
+    double discountPercent, string couponCode, bool expressShipping,
+    string shippingAddress, DateTime deliveryDate, string paymentMethod,
+    string creditCardNumber, string expiryDate, string cvv) {
+    // Implementation
+}
 ```
-Methods with many parameters are hard to call, understand, and maintain. They often indicate missing abstractions.
+**Problem:** Methods with many parameters are hard to call, understand, and maintain. They often indicate missing abstractions.
 
 ### Deep Nesting
 ```csharp
-if (data != null) {
-    if (data is string str) {
-        if (!string.IsNullOrEmpty(str)) {
-            if (str.Length > 10) {
-                // More nesting...
+public string ProcessData(object data) {
+    if (data != null) {
+        if (data is string str) {
+            if (!string.IsNullOrEmpty(str)) {
+                if (str.Length > 10) {
+                    if (str.Contains("@")) {
+                        // More nesting...
+                    }
+                }
+            }
+        }
+    }
+    return "Processed";
+}
 ```
-Deep nesting makes code hard to follow and understand the flow.
+**Problem:** Deep nesting makes code hard to follow and understand the flow.
 
 ### Hidden Side Effects
 ```csharp
-int CalculateTotal(List<int> numbers) {
+public int CalculateTotal(List<int> numbers) {
     GlobalCounter++;           // Hidden: modifies global state
     Console.WriteLine(...);    // Hidden: logs to console
     TrackUsage(...);          // Hidden: sends analytics
     return numbers.Sum();
 }
 ```
-Method name suggests pure calculation but performs hidden operations.
+**Problem:** Method name suggests pure calculation but performs hidden operations.
 
 ### Boolean Parameters
 ```csharp
-ProcessFile(filename, true, false, true) // What do these booleans mean?
+ProcessFile("data.txt", true, false, true); // What do these booleans mean?
 ```
-Boolean flags make method calls unclear and often indicate the method does multiple things.
+**Problem:** Boolean flags make method calls unclear and often indicate the method does multiple things.
 
-## Good Examples Analysis
+### Inconsistent Return Types
+```csharp
+public object GetUserInfo(int id) {
+    if (id > 0) return new { Name = "John", Age = 30 };  // Anonymous object
+    if (id == 0) return "Guest User";                    // String
+    return null;                                         // Null
+}
+```
+**Problem:** Unpredictable return types make code unreliable and hard to work with.
+
+## Good Examples
 
 ### Single Responsibility
 ```csharp
-ValidateUserRequest()     // Only validates
-CreateUserFromRequest()   // Only creates user object
-CalculateUserBonus()      // Only calculates bonus
-SaveUser()               // Only saves to database
+public UserProcessingResult ProcessUser(CreateUserRequest request) {
+    ValidateUserRequest(request);     // Only validates
+    var user = CreateUserFromRequest(request);  // Only creates user object
+    var bonus = CalculateUserBonus(user);       // Only calculates bonus
+    var savedUser = SaveUser(user);             // Only saves to database
+    
+    if (user.IsActive) {
+        SendWelcomeEmail(user.Email);           // Only sends email
+    }
+    
+    var report = GenerateUserReport(savedUser, bonus);  // Only generates report
+    LogUserProcessing(savedUser);               // Only logs
+    
+    return new UserProcessingResult(savedUser, report, bonus);
+}
 ```
-Each method has one clear purpose and can be tested independently.
+**Benefit:** Each method has one clear purpose and can be tested independently.
 
 ### Well-Defined Parameters
 ```csharp
-ProcessUser(CreateUserRequest request) // Single, meaningful parameter object
+public OrderResult CreateOrder(CreateOrderRequest request) {
+    // Single, meaningful parameter object instead of many primitives
+}
+
+public record CreateOrderRequest(
+    CustomerInfo CustomerInfo,
+    List<Product> Products,
+    ShippingInfo ShippingInfo,
+    PaymentInfo PaymentInfo
+);
 ```
-Using parameter objects instead of primitive obsession makes code more readable and maintainable.
+**Benefit:** Using parameter objects instead of primitive obsession makes code more readable and maintainable.
 
 ### Early Returns
 ```csharp
-if (input == null) return "Input cannot be null";
-if (string.IsNullOrEmpty(input)) return "Email cannot be empty";
-// Continue with main logic...
+public string ValidateEmailAddress(string input) {
+    if (input == null) return "Input cannot be null";
+    if (string.IsNullOrEmpty(input)) return "Email cannot be empty";
+    if (input.Length <= 10) return "Email is too short";
+    if (!input.Contains("@")) return "Email must contain @ symbol";
+    
+    // Continue with main logic...
+    return "Valid email";
+}
 ```
-Early returns eliminate deep nesting and make the happy path clear.
+**Benefit:** Early returns eliminate deep nesting and make the happy path clear.
 
 ### Pure Functions
 ```csharp
-int CalculateSum(IEnumerable<int> numbers) {
+public int CalculateSum(IEnumerable<int> numbers) {
     return numbers?.Sum() ?? 0; // No side effects, predictable output
 }
 ```
-Pure functions are easier to test, debug, and reason about.
+**Benefit:** Pure functions are easier to test, debug, and reason about.
 
 ### Explicit Side Effects
 ```csharp
-GetUserNameById()                    // Pure function
-GetUserNameByIdWithTracking()        // Explicitly indicates side effects
+public string GetUserNameById(int userId) {
+    // Pure function - only retrieves name
+    var user = GetUserFromDatabase(userId);
+    return user?.Name ?? "Unknown";
+}
+
+public string GetUserNameByIdWithTracking(int userId) {
+    // Explicitly indicates side effects in the name
+    var userName = GetUserNameById(userId);
+    TrackUserAccess(userId);
+    return userName;
+}
 ```
-Separating pure functions from those with side effects improves clarity.
+**Benefit:** Separating pure functions from those with side effects improves clarity.
+
+### Separate Methods Instead of Boolean Flags
+```csharp
+// Instead of: ProcessFile(filename, true, false, true)
+// Use explicit methods:
+
+public void ProcessFileWithValidation(string filename) {
+    ValidateFile(filename);
+    ProcessFile(filename);
+}
+
+public void ProcessFileWithLogging(string filename) {
+    ProcessFile(filename);
+    LogFileProcessing(filename);
+}
+
+public void ProcessFileWithBackup(string filename) {
+    BackupFile(filename);
+    ProcessFile(filename);
+}
+```
+**Benefit:** Method names clearly indicate intent without ambiguous boolean parameters.
+
+### Consistent Return Types
+```csharp
+public UserInfo GetUserInfo(int id) {
+    if (id <= 0)
+        return UserInfo.CreateGuestUser();
+    
+    var user = GetUserFromDatabase(id);
+    return user != null
+        ? UserInfo.FromUser(user)
+        : UserInfo.CreateUnknownUser();
+}
+```
+**Benefit:** Always returns the same type, making code predictable and reliable.
 
 ## Function Design Guidelines
 
-**Naming**: Use verbs for functions (Calculate, Process, Validate) and be specific about what they do.
+### Naming
+- Use verbs for functions (Calculate, Process, Validate)
+- Be specific about what they do
+- Avoid abbreviations and unclear names
+- Match the name to exactly what the function does
 
-**Return Types**: Be consistent. Don't return different types based on input conditions.
+### Parameters
+- Aim for 0-3 parameters maximum
+- Use parameter objects for related data
+- Avoid boolean flags - use separate methods instead
+- Put parameters in logical order
 
-**Error Handling**: Use exceptions for exceptional cases, not for control flow.
+### Return Values
+- Be consistent with return types
+- Use meaningful return types instead of primitives
+- Consider using Result patterns for operations that can fail
+- Avoid returning null when possible
 
-**Testing**: If a function is hard to test, it's probably doing too much.
-
-**Abstraction**: Group related parameters into objects rather than passing many primitives.
+### Side Effects
+- Minimize side effects in functions
+- Make side effects explicit in function names
+- Separate query operations from command operations
+- Use pure functions when possible
 
 ## Common Refactoring Patterns
 
@@ -120,8 +250,30 @@ Separating pure functions from those with side effects improves clarity.
 
 **Separate Query from Modifier**: Don't mix functions that return values with those that modify state.
 
-## Impact
+**Replace Conditional with Polymorphism**: Use inheritance/interfaces instead of large switch statements.
 
-**Bad functions slow development:** Complex functions with unclear responsibilities require more time to understand, modify, and debug.
+## Function Length Guidelines
 
-**Good functions accelerate development:** Small, focused functions are easier to understand, test, modify, and reuse across the codebase.
+**Ideal**: 5-20 lines for most functions
+
+**Warning Signs**: Functions longer than 30 lines often do too much
+
+**Extract When**: You need comments to explain sections within a function
+
+**One Screen Rule**: Functions should fit on one screen without scrolling
+
+## Impact on Development
+
+**Bad functions slow development:**
+- Complex functions with unclear responsibilities require more time to understand
+- Large functions are harder to modify without breaking something
+- Functions with many parameters are difficult to call correctly
+- Hidden side effects make debugging much harder
+
+**Good functions accelerate development:**
+- Small, focused functions are easier to understand at a glance
+- Single-responsibility functions can be tested independently
+- Well-named functions serve as documentation
+- Pure functions are reliable and predictable
+
+The effort invested in writing good functions pays dividends in reduced debugging time, easier feature additions, and more maintainable codebases.

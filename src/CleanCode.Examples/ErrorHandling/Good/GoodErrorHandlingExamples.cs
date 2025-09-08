@@ -94,7 +94,7 @@ public class GoodErrorHandlingExamples
     }
 
     // GOOD: Meaningful exception types with helpful messages
-    public void ProcessOrderSafely(CleanCode.Examples.ErrorHandling.Good.Order? order)
+    public void ProcessOrderSafely(Order? order)
     {
         if (order == null)
             throw new ArgumentNullException(nameof(order), "Order cannot be null");
@@ -195,7 +195,7 @@ public class GoodErrorHandlingExamples
                 // Stop processing if too many critical errors
                 if (criticalErrors.Count >= 3)
                 {
-                    _logger.LogError("Too many critical errors. Stopping batch processing");
+                    _logger.LogError(ex, "Error message: {Error}", ex.Message);
                     break;
                 }
             }
@@ -315,36 +315,6 @@ public class GoodErrorHandlingExamples
         }
     }
 
-    // GOOD: Clear error propagation with context
-    public async Task<ProcessingResult> ProcessComplexOperation(string inputData)
-    {
-        if (string.IsNullOrWhiteSpace(inputData))
-            return ProcessingResult.Invalid("Input data cannot be null or empty");
-
-        try
-        {
-            var parsed = await ParseDataSafely(inputData);
-            if (!parsed.IsSuccess)
-                return ProcessingResult.Failed($"Data parsing failed: {parsed.ErrorMessage}");
-
-            var validated = ValidateProcessedData(parsed.Data);
-            if (!validated.IsValid)
-                return ProcessingResult.Failed($"Data validation failed: {string.Join(", ", validated.Errors)}");
-
-            var processed = await ProcessValidatedData(validated.Data);
-            if (!processed.IsSuccess)
-                return ProcessingResult.Failed($"Data processing failed: {processed.ErrorMessage}");
-
-            await SaveProcessedData(processed.Data);
-            return ProcessingResult.Success("Data processed successfully");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Critical error in complex operation");
-            return ProcessingResult.Failed("A critical system error occurred");
-        }
-    }
-
     // GOOD: Consistent error handling pattern
     public async Task<OperationResult> DeleteUserSafely(int userId)
     {
@@ -377,23 +347,14 @@ public class GoodErrorHandlingExamples
     private bool IsValidEmail(string email) => email.Contains("@") && email.Contains(".");
     private Product GetProduct(string productId)
     {
-        if (string.IsNullOrWhiteSpace(productId) ||
-        productId.Equals("invalid", StringComparison.OrdinalIgnoreCase) ||
-        productId.Equals("invalid_product", StringComparison.OrdinalIgnoreCase))
-        {
+        if (string.IsNullOrWhiteSpace(productId) || productId.Equals("invalid", StringComparison.OrdinalIgnoreCase))
             return null;
-        }
         return new Product { BasePrice = 10.0m };
     }
-
     private decimal GetDiscountPercentage(string productId) => 10m;
     private Account GetAccount(string accountId) => new Account { Balance = 1000m };
     private void SaveAccount(Account account) { }
     private async Task ProcessSinglePaymentSafely(Payment payment) => await Task.CompletedTask;
-    private async Task<ParseResult> ParseDataSafely(string data) => await Task.FromResult(ParseResult.Success(new object()));
-    private ValidationResult ValidateProcessedData(object data) => ValidationResult.Success();
-    private async Task<ProcessResult> ProcessValidatedData(object data) => await Task.FromResult(ProcessResult.Success(new object()));
-    private async Task SaveProcessedData(object data) => await Task.CompletedTask;
 }
 
 // GOOD: Result patterns for error handling without exceptions
@@ -424,15 +385,13 @@ public class ValidationResult
 {
     public bool IsValid => !Errors.Any();
     public List<string> Errors { get; }
-    public object Data { get; }
 
-    private ValidationResult(List<string> errors, object data = null)
+    private ValidationResult(List<string> errors)
     {
         Errors = errors ?? new List<string>();
-        Data = data;
     }
 
-    public static ValidationResult Success(object data = null) => new(new List<string>(), data);
+    public static ValidationResult Success() => new(new List<string>());
     public static ValidationResult Failed(string error) => new(new List<string> { error });
     public static ValidationResult Failed(List<string> errors) => new(errors);
 }
@@ -453,22 +412,6 @@ public class ConfigurationResult<T>
     public static ConfigurationResult<T> Success(T value) => new(true, value, string.Empty);
     public static ConfigurationResult<T> Invalid(string message) => new(false, default, message);
     public static ConfigurationResult<T> Failure(string message) => new(false, default, message);
-}
-
-public class ProcessingResult
-{
-    public bool IsSuccess { get; private set; }
-    public string Message { get; private set; }
-
-    private ProcessingResult(bool isSuccess, string message)
-    {
-        IsSuccess = isSuccess;
-        Message = message ?? string.Empty;
-    }
-
-    public static ProcessingResult Success(string message) => new(true, message);
-    public static ProcessingResult Failed(string message) => new(false, message);
-    public static ProcessingResult Invalid(string message) => new(false, message);
 }
 
 public class OperationResult
@@ -522,59 +465,43 @@ public class PaymentResult
     public static PaymentResult Failed(string paymentId, string errorMessage) => new(paymentId, false, errorMessage);
 }
 
-public class ParseResult
-{
-    public bool IsSuccess { get; private set; }
-    public object Data { get; private set; }
-    public string ErrorMessage { get; private set; }
-
-    private ParseResult(bool isSuccess, object data, string errorMessage)
-    {
-        IsSuccess = isSuccess;
-        Data = data;
-        ErrorMessage = errorMessage ?? string.Empty;
-    }
-
-    public static ParseResult Success(object data) => new(true, data, string.Empty);
-    public static ParseResult Failed(string errorMessage) => new(false, null, errorMessage);
-}
-
-public class ProcessResult
-{
-    public bool IsSuccess { get; private set; }
-    public object Data { get; private set; }
-    public string ErrorMessage { get; private set; }
-
-    private ProcessResult(bool isSuccess, object data, string errorMessage)
-    {
-        IsSuccess = isSuccess;
-        Data = data;
-        ErrorMessage = errorMessage ?? string.Empty;
-    }
-
-    public static ProcessResult Success(object data) => new(true, data, string.Empty);
-    public static ProcessResult Failed(string errorMessage) => new(false, null, errorMessage);
-}
-
 // Supporting classes and exceptions
 public class User
 {
-    public string Name { get; set; } = "";
-    public string Email { get; set; } = "";
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
     public int Age { get; set; }
 }
-public class UserProfile { public string Bio { get; set; } = ""; }
-public class Product { public decimal BasePrice { get; set; } }
+
+public class UserProfile
+{
+    public string Bio { get; set; } = string.Empty;
+}
+
+public class Product
+{
+    public decimal BasePrice { get; set; }
+}
+
 public class Order
 {
-    public string Id { get; set; } = "";
+    public string Id { get; set; } = string.Empty;
     public int CustomerId { get; set; }
     public List<OrderItem> Items { get; set; } = new();
     public decimal Total { get; set; }
 }
+
 public class OrderItem { }
-public class Payment { public string Id { get; set; } = ""; }
-public class Account { public decimal Balance { get; set; } }
+
+public class Payment
+{
+    public string Id { get; set; } = string.Empty;
+}
+
+public class Account
+{
+    public decimal Balance { get; set; }
+}
 
 // Custom exceptions with meaningful names and messages
 public class FileProcessingException : Exception
@@ -649,7 +576,6 @@ public interface ILogger<T>
     void LogInformation(string message, params object[] args);
     void LogWarning(string message, params object[] args);
     void LogError(Exception exception, string message, params object[] args);
-    void LogError(string message, params object[] args);
 }
 
 public interface IUserService
@@ -665,7 +591,7 @@ public interface IConfigService
     T GetValue<T>(string key);
 }
 
-// Mock implementations for compilation
+// Simple mock implementations for compilation
 public class MockLogger<T> : ILogger<T>
 {
     public void LogInformation(string message, params object[] args)
@@ -703,18 +629,6 @@ public class MockLogger<T> : ILogger<T>
             Console.WriteLine($"ERROR: {message} - {exception?.Message}");
         }
     }
-
-    public void LogError(string message, params object[] args)
-    {
-        try
-        {
-            Console.WriteLine($"ERROR: {string.Format(message, args)}");
-        }
-        catch
-        {
-            Console.WriteLine($"ERROR: {message}");
-        }
-    }
 }
 
 public class MockUserService : IUserService
@@ -737,10 +651,8 @@ public class MockUserService : IUserService
         return userId > 0;
     }
 
-    public async Task DeleteAsync(int userId)
-    {
+    public async Task DeleteAsync(int userId) =>
         await Task.CompletedTask;
-    }
 }
 
 public class MockConfigService : IConfigService
@@ -748,9 +660,7 @@ public class MockConfigService : IConfigService
     public T GetValue<T>(string key)
     {
         if (typeof(T) == typeof(int))
-        {
-            return (T)(object)30; // Return an int for int requests
-        }
+            return (T)(object)30;
         return (T)(object)"mock_value";
     }
 }

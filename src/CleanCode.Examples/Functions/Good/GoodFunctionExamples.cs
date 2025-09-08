@@ -163,7 +163,6 @@ public class GoodFunctionExamples
     {
         if (request == null)
             throw new ArgumentNullException(nameof(request));
-        // Additional validation
     }
 
     private Order BuildOrder(CreateOrderRequest request)
@@ -179,28 +178,27 @@ public class GoodFunctionExamples
 
     private Order ProcessPayment(Order order, PaymentInfo paymentInfo)
     {
-        // Payment processing logic
         order.PaymentStatus = "Processed";
         return order;
     }
 
     private Order SaveOrder(Order order)
     {
-        // Database save logic
         order.Id = Guid.NewGuid();
         return order;
     }
 
-    private void ValidateFile(string filename) { /* Validation logic */ }
-    private void ProcessFile(string filename) { /* Processing logic */ }
-    private void LogFileProcessing(string filename) { /* Logging logic */ }
-    private void BackupFile(string filename) { /* Backup logic */ }
-    private void SendWelcomeEmail(string email) { /* Email logic */ }
+    // Supporting helper methods
+    private void ValidateFile(string filename) { }
+    private void ProcessFile(string filename) { }
+    private void LogFileProcessing(string filename) { }
+    private void BackupFile(string filename) { }
+    private void SendWelcomeEmail(string email) { }
     private User SaveUser(User user) { user.Id = Guid.NewGuid(); return user; }
     private string GenerateUserReport(User user, double bonus) => $"User: {user.Name}, Bonus: ${bonus:F2}";
-    private void LogUserProcessing(User user) { /* Logging logic */ }
+    private void LogUserProcessing(User user) { }
     private User GetUserFromDatabase(int id) => new User { Name = "John", Id = Guid.NewGuid() };
-    private void TrackUserAccess(int userId) { /* Analytics logic */ }
+    private void TrackUserAccess(int userId) { }
 }
 
 // GOOD: Well-defined data structures instead of many parameters

@@ -111,7 +111,7 @@ public partial class GoodCommentExamples
         return products
             .Where(p => p.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
             .Take(50) // Limit to 50 results to prevent performance issues
-            .Select(p => new SearchResult()) // Map Product to SearchResult
+            .Select(p => new SearchResult { Name = p.Name })
             .ToList();
     }
 
@@ -227,10 +227,15 @@ public partial class GoodCommentExamples
             .Aggregate(ValidationResult.Success(), (current, result) => current.Combine(result));
     }
 
-    // Supporting types and members
+    // Supporting fields and helper methods
     private readonly ILogger logger = new ConsoleLogger();
     private readonly IHttpClient httpClient = new HttpClientWrapper();
-    private readonly List<Product> products = new();
+    private readonly List<Product> products = new()
+    {
+        new() { Name = "Product A" },
+        new() { Name = "Product B" },
+        new() { Name = "Another Product" }
+    };
     private readonly IPaymentProcessor paymentProcessor = new MockPaymentProcessor();
     private readonly IAuditLogger auditLogger = new MockAuditLogger();
     private readonly IPaymentRetryQueue paymentRetryQueue = new MockRetryQueue();
@@ -250,18 +255,24 @@ public partial class GoodCommentExamples
 public enum NotificationPriority { Normal, High }
 public class DataItem { }
 public class ApiResponse { }
-public class PaymentRequest 
-{ 
+public class PaymentRequest
+{
     public int AccountId { get; set; }
     public decimal Amount { get; set; }
 }
-public class SearchResult { }
+public class SearchResult
+{
+    public string Name { get; set; } = string.Empty;
+}
 public class OrderItem
 {
     public decimal Value { get; set; }
     public bool IsRestricted { get; set; }
 }
-public class Address { public string State { get; set; } = ""; }
+public class Address
+{
+    public string State { get; set; } = string.Empty;
+}
 public class PaymentException : Exception
 {
     public bool IsRetryable { get; set; }
@@ -275,21 +286,48 @@ public class ValidationResult
 }
 public class Product
 {
-    public string Name { get; set; } = "";
+    public string Name { get; set; } = string.Empty;
 }
 
-// Mock interfaces and implementations
-public interface ILogger { void LogActivity(string userId, string activity, DateTime timestamp); }
-public interface IHttpClient { Task<ApiResponse> GetAsync(string endpoint); }
-public interface IValidator<T> { ValidationResult Validate(T item); }
-public interface IPaymentProcessor { PaymentResult ProcessPayment(PaymentRequest request); }
-public interface IAuditLogger { void LogPayment(int accountId, string transactionId, decimal amount); }
-public interface IPaymentRetryQueue { void Enqueue(PaymentRequest request); }
-public interface IRecommendationEngine { Task<List<Product>> GetRecommendationsAsync(int userId); }
+// Simple mock implementations
+public interface ILogger
+{
+    void LogActivity(string userId, string activity, DateTime timestamp);
+}
+
+public interface IHttpClient
+{
+    Task<ApiResponse> GetAsync(string endpoint);
+}
+
+public interface IValidator<T>
+{
+    ValidationResult Validate(T item);
+}
+
+public interface IPaymentProcessor
+{
+    PaymentResult ProcessPayment(PaymentRequest request);
+}
+
+public interface IAuditLogger
+{
+    void LogPayment(int accountId, string transactionId, decimal amount);
+}
+
+public interface IPaymentRetryQueue
+{
+    void Enqueue(PaymentRequest request);
+}
+
+public interface IRecommendationEngine
+{
+    Task<List<Product>> GetRecommendationsAsync(int userId);
+}
 
 public class PaymentResult
 {
-    public string TransactionId { get; set; } = "";
+    public string TransactionId { get; set; } = string.Empty;
     public decimal Amount { get; set; }
 }
 
@@ -354,7 +392,7 @@ public class MockRecommendationEngine : IRecommendationEngine
     public async Task<List<Product>> GetRecommendationsAsync(int userId)
     {
         await Task.CompletedTask;
-        return new List<Product>();
+        return new List<Product> { new() { Name = "Recommended Product" } };
     }
 }
 

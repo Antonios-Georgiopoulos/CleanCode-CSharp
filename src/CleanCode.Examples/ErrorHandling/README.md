@@ -18,7 +18,7 @@ Proper error handling is crucial for building robust, maintainable applications.
 
 **Provide Context** - Include relevant information in error messages to aid debugging.
 
-## Bad Examples Analysis
+## Bad Examples
 
 ### Swallowing Exceptions
 ```csharp
@@ -28,7 +28,7 @@ try {
     // BAD: Silent failure - we don't know what went wrong
 }
 ```
-Silent failures hide bugs and make debugging impossible. Always handle or propagate exceptions.
+**Problem:** Silent failures hide bugs and make debugging impossible. Always handle or propagate exceptions.
 
 ### Catching General Exceptions
 ```csharp
@@ -39,7 +39,7 @@ try {
     return "Error occurred"; // BAD: Treats all errors the same
 }
 ```
-Different exceptions need different handling. Network timeouts should be handled differently than validation errors.
+**Problem:** Different exceptions need different handling. Network timeouts should be handled differently than validation errors.
 
 ### Using Exceptions for Control Flow
 ```csharp
@@ -50,14 +50,14 @@ try {
     return false; // BAD: Exceptions for normal program flow
 }
 ```
-Exceptions are expensive and should be for exceptional cases, not normal business logic.
+**Problem:** Exceptions are expensive and should be for exceptional cases, not normal business logic.
 
 ### Poor Error Messages
 ```csharp
 if (order == null) throw new Exception("Error");
 if (order.Items.Count == 0) throw new Exception("Invalid order");
 ```
-Generic messages don't help developers understand what went wrong or how to fix it.
+**Problem:** Generic messages don't help developers understand what went wrong or how to fix it.
 
 ### Magic Return Values
 ```csharp
@@ -69,7 +69,7 @@ public decimal CalculatePrice(...) {
     }
 }
 ```
-Magic numbers are easy to miss and can be ambiguous. What if -1 is a valid price?
+**Problem:** Magic numbers are easy to miss and can be ambiguous. What if -1 is a valid price?
 
 ### Inconsistent Error Handling
 ```csharp
@@ -78,9 +78,30 @@ Magic numbers are easy to miss and can be ambiguous. What if -1 is a valid price
 // Method 3 returns null on error
 // Method 4 returns error codes
 ```
-Inconsistent patterns make code unpredictable and hard to maintain.
+**Problem:** Inconsistent patterns make code unpredictable and hard to maintain.
 
-## Good Examples Analysis
+### Nested Try-Catch Blocks
+```csharp
+try {
+    var parsed = ParseData(data);
+    try {
+        var validated = ValidateData(parsed);
+        try {
+            var processed = ProcessData(validated);
+            SaveData(processed);
+        } catch (ProcessingException ex) {
+            // BAD: Nested error handling is confusing
+        }
+    } catch (ValidationException ex) {
+        // BAD: Hard to follow error flow
+    }
+} catch (ParseException ex) {
+    // BAD: Multiple levels of nesting
+}
+```
+**Problem:** Nested error handling is confusing and makes code flow difficult to follow.
+
+## Good Examples
 
 ### Specific Exception Handling
 ```csharp
@@ -94,7 +115,7 @@ try {
     throw new FileProcessingException($"Error reading '{filePath}': {ex.Message}", ex);
 }
 ```
-Each exception type is handled specifically with context-rich error messages.
+**Benefit:** Each exception type is handled specifically with context-rich error messages.
 
 ### Input Validation
 ```csharp
@@ -109,7 +130,7 @@ public void ProcessOrder(Order order) {
         throw new InvalidOrderException($"Order total cannot be negative: {order.Total:C}");
 }
 ```
-Validate inputs early to fail fast and provide clear error messages.
+**Benefit:** Validate inputs early to fail fast and provide clear error messages.
 
 ### Result Pattern for Business Logic
 ```csharp
@@ -124,7 +145,7 @@ public ValidationResult ValidateUser(User user) {
         : ValidationResult.Success();
 }
 ```
-Use result patterns for expected validation failures instead of exceptions.
+**Benefit:** Use result patterns for expected validation failures instead of exceptions.
 
 ### Meaningful Exception Types
 ```csharp
@@ -136,7 +157,7 @@ public class InsufficientFundsException : Exception {
     public InsufficientFundsException(string message) : base(message) { }
 }
 ```
-Custom exception types make error handling more specific and intentional.
+**Benefit:** Custom exception types make error handling more specific and intentional.
 
 ### Proper Resource Management
 ```csharp
@@ -149,7 +170,25 @@ try {
     throw new FileProcessingException($"Failed to read file: {path}", ex);
 }
 ```
-Using statements ensure resources are disposed even when exceptions occur.
+**Benefit:** Using statements ensure resources are disposed even when exceptions occur.
+
+### Batch Processing with Individual Error Handling
+```csharp
+foreach (var payment in payments) {
+    try {
+        await ProcessPayment(payment);
+        results.Add(PaymentResult.Success(payment.Id));
+    } catch (PaymentValidationException ex) {
+        results.Add(PaymentResult.Failed(payment.Id, ex.Message));
+    } catch (InsufficientFundsException ex) {
+        results.Add(PaymentResult.Failed(payment.Id, "Insufficient funds"));
+    } catch (Exception ex) {
+        criticalErrors.Add(ex);
+        if (criticalErrors.Count >= 3) break; // Circuit breaker
+    }
+}
+```
+**Benefit:** Individual failures don't stop entire batch processing, with circuit breaker for system issues.
 
 ### Structured Error Results
 ```csharp
@@ -162,7 +201,23 @@ public class OperationResult {
     public static OperationResult Failed(string message) => new(false, message, Failed);
 }
 ```
-Structured results provide clear success/failure information with context.
+**Benefit:** Structured results provide clear success/failure information with context.
+
+### Configuration with Fallbacks
+```csharp
+public ConfigurationResult<T> GetConfigurationValue<T>(string key, T defaultValue = default) {
+    try {
+        var value = configService.GetValue<T>(key);
+        return ConfigurationResult<T>.Success(value);
+    } catch (ConfigurationNotFoundException) {
+        logger.LogWarning("Config key not found: {Key}. Using default: {Default}", key, defaultValue);
+        return ConfigurationResult<T>.Success(defaultValue);
+    } catch (ConfigurationParseException ex) {
+        return ConfigurationResult<T>.Invalid($"Invalid format for '{key}': {ex.Message}");
+    }
+}
+```
+**Benefit:** Graceful degradation with sensible defaults and clear error reporting.
 
 ## Error Handling Strategies
 
@@ -210,18 +265,6 @@ Structured results provide clear success/failure information with context.
 
 **Log at the Right Level**: Don't log the same error multiple times as it propagates.
 
-## Testing Error Conditions
-
-**Test Happy Path**: Ensure normal operation works correctly.
-
-**Test Error Conditions**: Verify proper error handling for various failure modes.
-
-**Test Edge Cases**: Boundary conditions, null inputs, empty collections.
-
-**Test Resource Cleanup**: Ensure resources are properly disposed on errors.
-
-**Test Error Messages**: Verify error messages are helpful and accurate.
-
 ## Common Anti-Patterns to Avoid
 
 **Pokemon Exception Handling**: Catching all exceptions with `catch (Exception)`
@@ -235,6 +278,8 @@ Structured results provide clear success/failure information with context.
 **Generic Error Messages**: "An error occurred" tells users nothing useful
 
 **Inconsistent Error Handling**: Different patterns across similar operations
+
+**Finally Block Misuse**: Business logic or exception-throwing code in finally blocks
 
 ## Impact on System Quality
 

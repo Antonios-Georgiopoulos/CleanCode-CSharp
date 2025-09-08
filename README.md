@@ -2,21 +2,21 @@
 
 [![CI](https://github.com/Antonios-Georgiopoulos/CleanCode-CSharp/actions/workflows/ci.yml/badge.svg)](https://github.com/Antonios-Georgiopoulos/CleanCode-CSharp/actions/workflows/ci.yml)
 
-A comprehensive collection of Clean Code examples in C# demonstrating best practices and common anti-patterns.
+A collection of tiny, focused Clean Code examples in C# showing **Bad vs Good** side by side — _no unit tests, zero scaffolding_.
 
 ## 🎯 Purpose
 
-This repository serves as a practical guide for writing clean, maintainable C# code. Each example shows both **bad** and **good** implementations with explanations.
+Keep examples **minimal** and **self‑explanatory**, so readers can grasp each idea at a glance without digging through frameworks or test code.
 
 ## 📚 Categories
 
-- [x] **Naming Conventions** - Meaningful names for variables, methods, and classes
-- [x] **Functions/Methods** - Single responsibility, parameter management
-- [x] **Classes** - Cohesion, encapsulation, proper design
-- [x] **SOLID Principles** - Five fundamental principles of OOP
-- [x] **Comments** - When and how to comment effectively
-- [x] **Error Handling** - Exceptions, validation, defensive programming
-- [x] **Code Formatting** - Consistent style and structure
+- [x] **Naming Conventions** — Meaningful names for variables, methods, and classes
+- [x] **Functions/Methods** — Single responsibility, parameter management
+- [x] **Classes** — Cohesion, encapsulation, proper design
+- [x] **SOLID Principles** — Five fundamental principles of OOP
+- [x] **Comments** — When and how to comment effectively
+- [x] **Error Handling** — Exceptions, validation, defensive programming
+- [x] **Code Formatting** — Consistent style and structure
 
 ## 🚀 Getting Started
 
@@ -25,20 +25,29 @@ git clone https://github.com/Antonios-Georgiopoulos/CleanCode-CSharp.git
 cd CleanCode-CSharp
 dotnet restore
 dotnet build
-dotnet test
 ```
+
+> There are **no tests** in this repo by design. The CI only restores and builds to ensure examples compile.
 
 ## 📖 How to Use
 
-Each category contains:
+Each category folder contains:
 
-- Bad/ - Examples of what NOT to do
-- Good/ - Clean code alternatives
-- Tests/ - Unit tests demonstrating usage
+- `Bad*.cs` — anti‑pattern(s), intentionally flawed
+- `Good*.cs` — clean alternative(s)
+- `README.md` — a short guide, _no references to testing_
+
+## ✅ Authoring Guidelines (PRs welcome)
+
+- Keep each example **< 60 LOC** and focused on _one idea_.
+- Prefer **plain C#** — no third‑party packages or frameworks.
+- Avoid infrastructure (DI containers, logging frameworks, etc.).
+- Use **clear naming, consistent casing**, and **named constants** over magic numbers.
+- No test files or helpers — this repo is about _reading_ code, not _testing_ it.
 
 ## 🤝 Contributing
 
-Feel free to contribute more examples or suggest improvements!
+Issues and PRs are welcome. Please follow the **Authoring Guidelines** above.
 
 ## 📄 License
 

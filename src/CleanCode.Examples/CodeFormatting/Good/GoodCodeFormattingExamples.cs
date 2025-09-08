@@ -63,19 +63,6 @@ public class GoodFormattingExamples
         Console.WriteLine("Method 3");
     }
 
-    // GOOD: Proper variable alignment and consistent formatting
-    public void ConfigureSettings()
-    {
-        var setting1 = "Value1";
-        var anotherSetting = "Value2";
-        var setting3 = "Value3";
-        var veryLongSettingName = "Value4";
-
-        var x = 10;
-        var y = 20;
-        var result = x + y;
-    }
-
     // GOOD: Well-indented nested code with clear structure
     public void ProcessNestedData()
     {
@@ -111,49 +98,6 @@ public class GoodFormattingExamples
 
         var x = 5; // Inline comment with proper spacing
         var y = 10; // Another inline comment with consistent spacing
-    }
-
-    // GOOD: Consistent naming conventions
-    public class ConsistentNamingConventions
-    {
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public string EmailAddress { get; set; } = string.Empty;
-        public int Age { get; set; }
-        public bool IsActive { get; set; }
-
-        public void ProcessData() { }
-        public void ProcessUser() { }
-        public void CalculateTotal() { }
-    }
-
-    // GOOD: Logical grouping of related members
-    public class WellOrganizedMembers
-    {
-        // Properties grouped together
-        public string Name { get; set; } = string.Empty;
-        public int Age { get; set; }
-        public string Email { get; set; } = string.Empty;
-        public bool IsActive { get; set; }
-
-        // Private fields grouped together
-        private readonly string _secretKey = string.Empty;
-        private readonly ILogger _logger;
-
-        // Constructor
-        public WellOrganizedMembers(ILogger logger)
-        {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        // Public methods grouped together
-        public void ProcessOrder() { }
-        public void CalculateTotal() { }
-        public void ValidateUser() { }
-
-        // Private methods grouped together
-        private void InternalMethod() { }
-        private void AnotherInternalMethod() { }
     }
 
     // GOOD: Consistent string formatting using interpolation
@@ -220,7 +164,7 @@ public class GoodFormattingExamples
         }
     }
 
-    // GOOD: Clean switch statement formatting
+    // GOOD: Modern switch expressions
     public string GoodSwitchFormatting(int value)
     {
         return value switch
@@ -232,7 +176,7 @@ public class GoodFormattingExamples
         };
     }
 
-    // GOOD: Alternative switch formatting for complex cases
+    // GOOD: Alternative traditional switch formatting
     public string GoodTraditionalSwitchFormatting(int value)
     {
         switch (value)
@@ -246,26 +190,6 @@ public class GoodFormattingExamples
             default:
                 return "Unknown";
         }
-    }
-
-    // GOOD: Property initialization patterns
-    public class PropertyInitializationExamples
-    {
-        // GOOD: Simple property initialization
-        public string Name { get; set; } = string.Empty;
-        public List<string> Items { get; set; } = new();
-
-        // GOOD: Required properties with clear formatting
-        public required string RequiredProperty { get; set; }
-        public required int RequiredNumber { get; set; }
-
-        // GOOD: Complex object initialization
-        public UserPreferences Preferences { get; set; } = new()
-        {
-            Theme = "Dark",
-            Language = "English",
-            EnableNotifications = true
-        };
     }
 
     // GOOD: Method chaining with proper formatting
@@ -306,43 +230,6 @@ public class GoodFormattingExamples
         {
             Console.WriteLine($"Error processing users: {ex.Message}");
             return new List<User>();
-        }
-    }
-
-    // GOOD: Interface implementation formatting
-    public class ServiceImplementation : IUserService, IDisposable
-    {
-        private readonly ILogger _logger;
-        private readonly IRepository _repository;
-        private bool _disposed = false;
-
-        public ServiceImplementation(ILogger logger, IRepository repository)
-        {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        }
-
-        public async Task<User> GetUserAsync(int id)
-        {
-            if (id <= 0)
-                throw new ArgumentException("User ID must be positive", nameof(id));
-
-            return await _repository.GetByIdAsync(id);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposed && disposing)
-            {
-                _repository?.Dispose();
-                _disposed = true;
-            }
         }
     }
 
@@ -411,7 +298,70 @@ public class GoodFormattingExamples
     private async Task ProcessUserAsync(User user) => await Task.CompletedTask;
 }
 
-// GOOD: Well-formatted supporting classes
+// GOOD: Consistent naming conventions
+public class ConsistentNamingConventions
+{
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public string EmailAddress { get; set; } = string.Empty;
+    public int Age { get; set; }
+    public bool IsActive { get; set; }
+
+    public void ProcessData() { }
+    public void ProcessUser() { }
+    public void CalculateTotal() { }
+}
+
+// GOOD: Logical grouping of related members
+public class WellOrganizedMembers
+{
+    // Properties grouped together
+    public string Name { get; set; } = string.Empty;
+    public int Age { get; set; }
+    public string Email { get; set; } = string.Empty;
+    public bool IsActive { get; set; }
+
+    // Private fields grouped together
+    private readonly string _secretKey = string.Empty;
+    private readonly ILogger _logger;
+
+    // Constructor
+    public WellOrganizedMembers(ILogger logger)
+    {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+    // Public methods grouped together
+    public void ProcessOrder() { }
+    public void CalculateTotal() { }
+    public void ValidateUser() { }
+
+    // Private methods grouped together
+    private void InternalMethod() { }
+    private void AnotherInternalMethod() { }
+}
+
+// GOOD: Property initialization patterns
+public class PropertyInitializationExamples
+{
+    // Simple property initialization
+    public string Name { get; set; } = string.Empty;
+    public List<string> Items { get; set; } = new();
+
+    // Required properties with clear formatting
+    public required string RequiredProperty { get; set; }
+    public required int RequiredNumber { get; set; }
+
+    // Complex object initialization
+    public UserPreferences Preferences { get; set; } = new()
+    {
+        Theme = "Dark",
+        Language = "English",
+        EnableNotifications = true
+    };
+}
+
+// Supporting classes with good formatting
 public class User
 {
     public int Id { get; set; }
@@ -495,17 +445,7 @@ public class UserDto
     public bool IsActive { get; set; }
 }
 
-// Supporting interfaces
-public interface IUserService
-{
-    Task<User> GetUserAsync(int id);
-}
-
-public interface IRepository : IDisposable
-{
-    Task<User> GetByIdAsync(int id);
-}
-
+// Supporting interface
 public interface ILogger
 {
     void Log(string message);

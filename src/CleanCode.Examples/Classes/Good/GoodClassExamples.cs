@@ -61,7 +61,7 @@ public record User
 // GOOD: Single Responsibility - only handles user validation
 public class UserValidator
 {
-    public virtual ValidationResult ValidateForCreation(string name, string email, string role, string department)
+    public ValidationResult ValidateForCreation(string name, string email, string role, string department)
     {
         var errors = new List<string>();
 
@@ -91,18 +91,15 @@ public class UserValidator
 // GOOD: Single Responsibility - only handles user persistence
 public class UserRepository
 {
-    private readonly IDbConnection? _connection;
+    private readonly IDbConnection _connection;
 
-    public UserRepository(IDbConnection? connection)
+    public UserRepository(IDbConnection connection)
     {
-        _connection = connection; // allow null for tests/mocks
+        _connection = connection ?? throw new ArgumentNullException(nameof(connection));
     }
 
-    public virtual async Task<User> SaveAsync(User user)
+    public async Task<User> SaveAsync(User user)
     {
-        if (_connection is null)
-            throw new InvalidOperationException("No DB connection configured.");
-
         const string sql = @"
                 INSERT INTO Users (Name, Email, Role, Department, Salary, CreatedAt, IsActive) 
                 VALUES (@Name, @Email, @Role, @Department, @Salary, @CreatedAt, @IsActive);
@@ -112,20 +109,14 @@ public class UserRepository
         return user with { Id = id };
     }
 
-    public virtual async Task<User?> GetByIdAsync(int id)
+    public async Task<User?> GetByIdAsync(int id)
     {
-        if (_connection is null)
-            throw new InvalidOperationException("No DB connection configured.");
-
         const string sql = "SELECT * FROM Users WHERE Id = @Id";
         return await _connection.QuerySingleOrDefaultAsync<User>(sql, new { Id = id });
     }
 
-    public virtual async Task<IEnumerable<User>> GetActiveUsersAsync()
+    public async Task<IEnumerable<User>> GetActiveUsersAsync()
     {
-        if (_connection is null)
-            throw new InvalidOperationException("No DB connection configured.");
-
         const string sql = "SELECT * FROM Users WHERE IsActive = 1";
         return await _connection.QueryAsync<User>(sql);
     }
@@ -296,9 +287,7 @@ public class OrderCalculator
     private decimal CalculateShipping(IEnumerable<OrderItem> items, ShippingMethod method)
     {
         var weight = items.Sum(item => item.Weight * item.Quantity);
-        // Round up the weight before calculating cost to match test expectation (3.5 -> 4 -> cost 8)
-        var rounded = Math.Ceiling((double)weight);
-        return method.CalculateShippingCost((decimal)rounded);
+        return method.CalculateShippingCost(weight);
     }
 }
 

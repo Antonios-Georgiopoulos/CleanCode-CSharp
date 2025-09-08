@@ -16,7 +16,7 @@ Well-designed classes form the backbone of maintainable software. They should ha
 
 **Rich Domain Models** - Objects should contain both data and the behavior that operates on that data.
 
-## Bad Examples Analysis
+## Bad Examples
 
 ### God Object
 ```csharp
@@ -25,7 +25,7 @@ class UserManager {
     void CreateUser(...) // Does everything!
 }
 ```
-This class violates Single Responsibility by handling multiple concerns, making it hard to test, modify, and understand.
+**Problem:** This class violates Single Responsibility by handling multiple concerns, making it hard to modify and understand.
 
 ### Poor Encapsulation
 ```csharp
@@ -35,7 +35,7 @@ class User {
     public bool IsDebugMode;        // No control over when it changes
 }
 ```
-Public fields expose internal implementation and allow external code to break object invariants.
+**Problem:** Public fields expose internal implementation and allow external code to break object invariants.
 
 ### Anemic Domain Model
 ```csharp
@@ -45,7 +45,7 @@ class User {
     // No business logic - just a data container
 }
 ```
-Objects that only hold data without behavior push all logic into service classes, missing opportunities for encapsulation.
+**Problem:** Objects that only hold data without behavior push all logic into service classes, missing opportunities for encapsulation.
 
 ### Inheritance Misuse
 ```csharp
@@ -55,20 +55,20 @@ class Penguin : Bird {
     }
 }
 ```
-Inheritance used incorrectly when "Is-A" relationship doesn't truly exist.
+**Problem:** Inheritance used incorrectly when "Is-A" relationship doesn't truly exist.
 
 ### Static Dependencies
 ```csharp
 static class UserService {
     public static void CreateUser(User user) {
-        DatabaseHelper.ExecuteQuery(...);  // Can't be mocked
-        EmailService.SendEmail(...);       // Can't be tested in isolation
+        DatabaseHelper.ExecuteQuery(...);  // Tightly coupled
+        EmailService.SendEmail(...);       // Hard to modify
     }
 }
 ```
-Static dependencies make unit testing difficult and coupling tight.
+**Problem:** Static dependencies create tight coupling and make the code inflexible.
 
-## Good Examples Analysis
+## Good Examples
 
 ### Single Responsibility Classes
 ```csharp
@@ -77,7 +77,7 @@ class UserRepository    // Only handles persistence
 class EmailService      // Only sends emails
 class UserService       // Orchestrates the process
 ```
-Each class has one clear purpose and can evolve independently.
+**Benefit:** Each class has one clear purpose and can evolve independently.
 
 ### Rich Domain Model
 ```csharp
@@ -87,7 +87,7 @@ class User {
     public bool IsEligibleForBonus() { /* Business logic */ }
 }
 ```
-Business logic is encapsulated within the entity, making the model self-protecting and expressive.
+**Benefit:** Business logic is encapsulated within the entity, making the model self-protecting and expressive.
 
 ### Proper Encapsulation
 ```csharp
@@ -100,7 +100,7 @@ class User {
     }
 }
 ```
-Internal state is protected and modifications go through controlled methods that maintain invariants.
+**Benefit:** Internal state is protected and modifications go through controlled methods that maintain invariants.
 
 ### Dependency Injection
 ```csharp
@@ -114,7 +114,7 @@ class UserService {
     }
 }
 ```
-Dependencies are injected as interfaces, enabling testing and flexibility.
+**Benefit:** Dependencies are injected as interfaces, enabling flexibility and easier modification.
 
 ### Composition Over Inheritance
 ```csharp
@@ -125,7 +125,7 @@ class Duck : Bird, IFlyable, ISwimmable {
     // Implements multiple behaviors through composition
 }
 ```
-Behavior is composed through interfaces rather than forced inheritance hierarchies.
+**Benefit:** Behavior is composed through interfaces rather than forced inheritance hierarchies.
 
 ## Class Design Guidelines
 
@@ -155,6 +155,6 @@ Behavior is composed through interfaces rather than forced inheritance hierarchi
 
 ## Impact
 
-**Bad class design creates technical debt:** Tightly coupled, poorly encapsulated classes become increasingly difficult to modify and test as the system grows.
+**Bad class design creates technical debt:** Tightly coupled, poorly encapsulated classes become increasingly difficult to modify as the system grows.
 
 **Good class design enables growth:** Well-designed classes with clear responsibilities and proper encapsulation make the codebase more maintainable and extensible.

@@ -1,87 +1,42 @@
-﻿# Naming Conventions
+﻿## Naming Conventions
 
-## Overview
+Clear, descriptive names reduce cognitive load and make code self‑documenting. Poor naming forces readers to guess intent.
 
-Clear, descriptive names reduce cognitive load and make code self-documenting. Poor naming forces developers to constantly refer to documentation or guess intent.
+### Core Rules
+- **Intention‑revealing**: Names answer *what/why/how*.
+- **No disinformation**: Avoid misleading or type‑hint names.
+- **Meaningful distinctions**: Skip noise words like `Data`, `Info`, `Manager`.
+- **Pronounceable & searchable**: Avoid `usr`, `pwd`, one‑letter vars (beyond simple loops).
+- **Consistent casing**: Stick to PascalCase for types/members, camelCase for locals.
 
-## Key Principles
-
-**Use intention-revealing names** - Names should answer why it exists, what it does, and how it's used.
-
-**Avoid disinformation** - Don't use names that obscure meaning or suggest wrong types.
-
-**Make meaningful distinctions** - Avoid noise words like `Data`, `Info`, `Manager`.
-
-**Use pronounceable names** - Code is read more often than written.
-
-**Use searchable names** - Single-letter variables and magic numbers are unsearchable.
-
-## Bad Examples Analysis
-
-### Cryptic Abbreviations
+### Bad vs Good
+**Bad**
 ```csharp
-string usr, pwd, db;  // What kind of user? Database what?
+public class Calc
+{
+    public double a, b;                // Single‑letter variables
+    public string usr, pwd;            // Cryptic abbreviations
+    public int iCount;                 // Hungarian notation
+    public void DoStuff() { /* ... */ } // Meaningless method name
+}
 ```
 
-### Hungarian Notation
+**Good**
 ```csharp
-int iCount;     // Type is obvious from declaration
-string strName; // Redundant prefix
-bool bIsActive; // Outdated practice
+public class OrderCalculator
+{
+    public double FirstNumber { get; set; }
+    public double SecondNumber { get; set; }
+    public bool IsActive { get; set; }
+
+    private const int MinimumValidValue = 5; // Named constant
+    private void ProcessCustomer(Customer customer, int timeoutSeconds) { }
+}
 ```
 
-### Meaningless Names
-```csharp
-void DoStuff()           // Does what exactly?
-object GetData()         // What data?
-void Process(object data, int flag) // Process how? Flag for what?
-```
-
-### Magic Numbers
-```csharp
-if (x > 5) { ProcessData(temp, 42); } // Why 5? Why 42?
-```
-
-## Good Examples Analysis
-
-### Self-Documenting Names
-```csharp
-string Username;                    // Clear purpose
-string DatabaseConnectionString;    // Specific and descriptive
-bool IsAccountActive;              // Boolean intent clear
-```
-
-### Meaningful Methods
-```csharp
-void CalculateAndDisplayResults()               // Clear action
-CustomerDataModel GetCustomerDataFromDatabase() // Returns what, from where
-void ProcessCustomerData(object data, int timeoutInSeconds) // Clear parameters
-```
-
-### Named Constants
-```csharp
-const int MinimumValidValue = 5;
-const int DefaultProcessingTimeout = 42;
-```
-
-## Quick Rules
-
-- **Classes**: Nouns (Customer, Account, Parser)
-- **Methods**: Verbs (Calculate, Process, Validate)
-- **Booleans**: Questions (IsActive, HasPermission, CanAccess)
-- **Constants**: Descriptive (MaxRetryCount, DefaultTimeout)
-- **Variables**: Intention-revealing (customerEmail, orderTotal)
-
-## Common Mistakes
-
-- Single letter variables (except loop counters)
-- Abbreviations (usr, pwd, calc)
-- Noise words (DataInfo, ProcessManager)
-- Inconsistent casing (userName, user_email, UserAddress)
-- Type prefixes (strName, iCount)
-
-## Impact
-
-**Bad naming costs time:** Developers spend extra mental energy deciphering intent, leading to bugs and slower development.
-
-**Good naming saves time:** Code becomes self-documenting, reducing need for comments and documentation lookups.
+### Checklist (before commit aa single line of code)
+- [ ] Would a new teammate understand the purpose from the name alone?
+- [ ] Are booleans phrased as questions (e.g., `IsActive`, `HasItems`)?
+- [ ] Any magic numbers replaced with named constants?
+- [ ] Any abbreviations, type prefixes, or mixed casing to fix?
+- [ ] Are methods verbs and classes nouns?

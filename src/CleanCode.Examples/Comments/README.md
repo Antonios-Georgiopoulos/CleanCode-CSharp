@@ -16,7 +16,7 @@ Good comments explain WHY, not WHAT. The best code is self-documenting and needs
 
 **Use comments for complex business logic** - Algorithms, formulas, and business rules benefit from explanation.
 
-## Bad Examples Analysis
+## Bad Examples
 
 ### Obvious Comments
 ```csharp
@@ -26,14 +26,14 @@ return a + b;
 // Increment the counter by 1
 counter++;
 ```
-These comments state the obvious and waste time. The code is already clear.
+**Problem:** These comments state the obvious and waste time. The code is already clear.
 
 ### Misleading Comments
 ```csharp
 // Apply 10% discount
 return price * 0.15m; // Actually applies 15%!
 ```
-Misleading comments are dangerous. When code changes, comments often don't get updated.
+**Problem:** Misleading comments are dangerous. When code changes, comments often don't get updated.
 
 ### Commented-Out Code
 ```csharp
@@ -41,7 +41,7 @@ Misleading comments are dangerous. When code changes, comments often don't get u
 // SendEmail();          // Email sending removed
 // LogOrder();           // Logging disabled for now
 ```
-Version control systems track removed code better than comments. Commented code creates confusion.
+**Problem:** Version control systems track removed code better than comments. Commented code creates confusion.
 
 ### Noise Comments
 ```csharp
@@ -54,7 +54,7 @@ public class Customer
     public string Email { get; set; }
 }
 ```
-Property names and types already convey this information. These comments add no value.
+**Problem:** Property names and types already convey this information. These comments add no value.
 
 ### Comments Explaining Bad Code
 ```csharp
@@ -63,7 +63,7 @@ Property names and types already convey this information. These comments add no 
 // Then we check if each item is valid
 // If valid, we process it differently based on type
 ```
-If code needs extensive comments to be understood, refactor the code instead.
+**Problem:** If code needs extensive comments to be understood, refactor the code instead.
 
 ### Outdated Comments
 ```csharp
@@ -71,9 +71,17 @@ If code needs extensive comments to be understood, refactor the code instead.
 // Apply senior discount if applicable (removed this feature)
 // Save to database (now we save to cloud)
 ```
-Outdated comments mislead developers and indicate poor maintenance practices.
+**Problem:** Outdated comments mislead developers and indicate poor maintenance practices.
 
-## Good Examples Analysis
+### Unprofessional Comments
+```csharp
+// This payment API is terrible and always breaks
+// TODO: Replace this garbage with something that actually works
+// Hack to make this work - don't ask me why
+```
+**Problem:** Expressing frustration in comments is unprofessional and unhelpful.
+
+## Good Examples
 
 ### Business Logic Explanation
 ```csharp
@@ -81,14 +89,14 @@ Outdated comments mislead developers and indicate poor maintenance practices.
 // Where P = principal, r = annual rate, t = time in years
 return principal * (decimal)Math.Pow((double)(1 + rate), years);
 ```
-Explains the mathematical formula being implemented, which isn't obvious from code alone.
+**Benefit:** Explains the mathematical formula being implemented, which isn't obvious from code alone.
 
 ### Warning Comments
 ```csharp
 // WARNING: This method loads all items into memory.
 // For datasets > 10,000 items, consider using ProcessLargeDatasetStreaming() instead.
 ```
-Prevents performance issues by warning about constraints and suggesting alternatives.
+**Benefit:** Prevents performance issues by warning about constraints and suggesting alternatives.
 
 ### Implementation Decisions
 ```csharp
@@ -96,7 +104,7 @@ Prevents performance issues by warning about constraints and suggesting alternat
 // in high-concurrency scenarios where multiple IDs might be generated
 // within the same millisecond
 ```
-Explains WHY a particular approach was chosen over alternatives.
+**Benefit:** Explains WHY a particular approach was chosen over alternatives.
 
 ### Legal/Compliance Requirements
 ```csharp
@@ -105,7 +113,7 @@ var anonymizedUserId = HashUserId(userId);
 
 // Retention policy: Activity logs are automatically purged after 90 days
 ```
-Documents regulatory requirements that drive implementation decisions.
+**Benefit:** Documents regulatory requirements that drive implementation decisions.
 
 ### API Documentation
 ```csharp
@@ -116,14 +124,23 @@ Documents regulatory requirements that drive implementation decisions.
 /// <returns>True if the email is valid; otherwise, false</returns>
 /// <exception cref="ArgumentNullException">Thrown when email is null</exception>
 ```
-XML documentation provides comprehensive API information for public interfaces.
+**Benefit:** XML documentation provides comprehensive API information for public interfaces.
 
 ### Performance Explanations
 ```csharp
 // Cache user recommendations for 1 hour to reduce database load
 // Recommendation calculation is expensive (ML model inference)
 ```
-Explains optimization decisions and trade-offs made for performance.
+**Benefit:** Explains optimization decisions and trade-offs made for performance.
+
+### Complex Regular Expressions
+```csharp
+[GeneratedRegex(
+    @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+    RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+private static partial Regex EmailRegex();
+```
+**Benefit:** Complex patterns benefit from explanation, even if just the attribute name clarifies intent.
 
 ## Self-Documenting Code Techniques
 
@@ -138,6 +155,8 @@ Explains optimization decisions and trade-offs made for performance.
 **Clear Return Types**: `ValidationResult` instead of `bool` when more context is needed
 
 **Enumeration over Magic Numbers**: `NotificationPriority.High` instead of `1`
+
+**Expressive Properties**: `order.IsEligibleForFreeShipping` instead of `order.Total >= 50`
 
 ## When Comments Add Value
 
@@ -155,6 +174,8 @@ Explains optimization decisions and trade-offs made for performance.
 
 **Security Decisions**: Why certain approaches were chosen for security reasons
 
+**Non-obvious Constraints**: Memory limits, timing requirements, API rate limits
+
 ## Comment Maintenance
 
 **Update comments when code changes** - Treat comments as part of the code that needs maintenance
@@ -164,6 +185,8 @@ Explains optimization decisions and trade-offs made for performance.
 **Review comments during code reviews** - Check for accuracy and necessity
 
 **Use linting tools** - Automated tools can catch some comment quality issues
+
+**Avoid version control information in comments** - Let Git handle history tracking
 
 ## XML Documentation Guidelines
 
@@ -176,6 +199,8 @@ Explains optimization decisions and trade-offs made for performance.
 **Explain parameters** - Clarify what each parameter represents and valid ranges
 
 **Describe return values** - Explain what the method returns and possible values
+
+**Keep it concise** - Avoid rambling explanations that restate the obvious
 
 ## Impact on Code Quality
 
