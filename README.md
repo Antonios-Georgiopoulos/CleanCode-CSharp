@@ -1,7 +1,6 @@
 # Clean Code Examples in C#
 
-[![CI](https://github.com/Antonios-Georgiopoulos/CleanCode-CSharp/actions/workflows/ci.yml/badge.svg)](https://github.com/Antonios-Georgiopoulos/CleanCode-CSharp/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/Antonios-Georgiopoulos/CleanCode-CSharp/branch/main/graph/badge.svg)](https://codecov.io/gh/Antonios-Georgiopoulos/CleanCode-CSharp)
+[![NET - CI](https://github.com/Antonios-Georgiopoulos/CleanCode-CSharp/actions/workflows/ci.yml/badge.svg)](https://github.com/Antonios-Georgiopoulos/CleanCode-CSharp/actions/workflows/ci.yml)
 
 A comprehensive collection of Clean Code examples in C# demonstrating best practices and common anti-patterns.
 
